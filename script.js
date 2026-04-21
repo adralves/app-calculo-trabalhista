@@ -12,7 +12,22 @@ function formatWhatsapp(value) {
     return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
 }
 
+function formatCurrency(value, blurry = false) {
+    let v = String(value || '').replace(/\D/g, '');
+    if (!v) return '';
+    
+    // Converte para número para formatar separadores de milhar
+    let amount = parseInt(v);
+    let formatted = amount.toLocaleString('pt-BR');
+    
+    if (blurry) {
+        return 'R$ ' + formatted + ',00';
+    }
+    return formatted;
+}
+
 window.formatWhatsapp = formatWhatsapp;
+window.formatCurrency = formatCurrency;
 
 function initCalculatorForm() {
     const form = document.getElementById('calcForm');
@@ -48,8 +63,6 @@ function initCalculatorForm() {
 
     if (whatsappInput && !whatsappInput.dataset.maskReady) {
         whatsappInput.dataset.maskReady = 'true';
-        whatsappInput.value = formatWhatsapp(whatsappInput.value);
-
         whatsappInput.addEventListener('input', (event) => {
             event.target.value = formatWhatsapp(event.target.value);
             validateWhatsapp();
@@ -58,6 +71,37 @@ function initCalculatorForm() {
         whatsappInput.addEventListener('blur', () => {
             validateWhatsapp();
             whatsappInput.reportValidity();
+        });
+    }
+
+    const salaryInput = document.getElementById('ultimo_salario');
+    if (salaryInput && !salaryInput.dataset.maskReady) {
+        salaryInput.dataset.maskReady = 'true';
+        
+        salaryInput.addEventListener('input', (event) => {
+            let value = event.target.value.replace(/\D/g, '');
+            event.target.value = formatCurrency(value, false);
+        });
+
+        salaryInput.addEventListener('blur', (event) => {
+            let value = event.target.value.replace(/\D/g, '');
+            if (value) {
+                event.target.value = formatCurrency(value, true);
+            }
+        });
+        
+        salaryInput.addEventListener('focus', (event) => {
+            let value = event.target.value.replace(/\D/g, '');
+            if (value) {
+                event.target.value = value; 
+            }
+        });
+    }
+
+    const nameInput = document.getElementById('nome');
+    if (nameInput) {
+        nameInput.addEventListener('blur', (event) => {
+            event.target.value = event.target.value.toUpperCase();
         });
     }
 
@@ -89,6 +133,11 @@ function initCalculatorForm() {
 
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
+
+        // Limpa a formatação de moeda antes de enviar
+        if (data.ultimo_salario) {
+            data.ultimo_salario = data.ultimo_salario.replace(/[R$\s.]/g, '').replace(',', '.');
+        }
 
         try {
             const response = await fetch('api/calcular.php', {

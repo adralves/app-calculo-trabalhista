@@ -280,6 +280,44 @@ function formatMoney($val)
             cursor: not-allowed;
             background: #f9f9f9;
         }
+
+        /* Ajustes para Celular (Mobile) */
+        @media (max-width: 480px) {
+            .admin-container {
+                padding: 0 10px;
+                margin: 20px auto;
+            }
+            .search-box {
+                flex-direction: column;
+            }
+            .search-box button {
+                width: 100% !important;
+            }
+            .hero-header-row th {
+                font-size: 10px;
+                padding: 10px 4px;
+            }
+            .data-row td {
+                padding: 12px 4px;
+                font-size: 12px;
+            }
+            .inner-label {
+                font-size: 0.6rem;
+            }
+            .inner-value {
+                font-size: 1rem;
+            }
+            .card-record {
+                padding: 12px;
+            }
+            .summary-inner {
+                gap: 10px;
+            }
+            .btn-view {
+                width: 100%;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 

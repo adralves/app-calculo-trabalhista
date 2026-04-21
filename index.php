@@ -79,8 +79,8 @@
 
                     <div class="form-group">
                         <label for="ultimo_salario">Qual o seu salario? (R$)</label>
-                        <input type="number" id="ultimo_salario" name="ultimo_salario" step="0.01" min="0"
-                            placeholder="0,00" required>
+                        <input type="tel" id="ultimo_salario" name="ultimo_salario"
+                            placeholder="R$ 0,00" required>
                     </div>
 
                     <div class="form-group">

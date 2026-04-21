@@ -121,6 +121,19 @@ $zapUrl = "https://wa.me/5585991562067?text=" . urlencode($mensagemZap);
             text-align: justify;
             line-height: 1.5;
         }
+
+        /* Ajustes para Celular (Mobile) */
+        @media (max-width: 480px) {
+            .valor-box p {
+                font-size: 2rem; /* Valor menor no celular */
+            }
+            .valor-box h3 {
+                font-size: 1rem;
+            }
+            .valor-box {
+                padding: 1.5rem 1rem;
+            }
+        }
     </style>
 </head>
 <body>
