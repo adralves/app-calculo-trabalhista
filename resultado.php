@@ -17,7 +17,7 @@ function formatMoney($val) {
 
 // Mensagem para o WhatsApp
 //$mensagemZap = "Olá, me chamo " . $nome . ". Meu número de cálculo é " . $id_calc . ". Gostaria de receber o relatório completo.";
-$zapUrl = "https://wa.me/5585991562067?text=Olá! Gostaria de receber o relatório completo."; //. urlencode($mensagemZap);
+$zapUrl = "https://wa.me/5585991562067?text=#20 - Olá! Gostaria de receber o relatório completo N.º ". $id_calc ."."; //. urlencode($mensagemZap);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
