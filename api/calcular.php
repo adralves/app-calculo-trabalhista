@@ -95,7 +95,7 @@ if ($mesesProp > 0 && $motivo !== 'dispensa_com_justa_causa') {
 
 // 6. Multa FGTS (Simplificado - Base de 8% mensal ao longo dos anos)
 $multaFGTS = 0;
-if ($motivo === 'dispensa_sem_justa_causa') {
+if ($motivo === 'dispensa_sem_justa_causa' || $motivo === 'rescisao_indireta') {
     // Estimativa do saldo do FGTS (8% do salario x meses trabalhados)
     $saldoFGTS = ($salario * 0.08) * $mesesTrabalhadosTotal;
     $multaFGTS = $saldoFGTS * 0.40; // Multa 40%

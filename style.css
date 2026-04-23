@@ -199,9 +199,118 @@ select:focus {
     box-shadow: 0 0 0 3px rgba(196, 154, 120, 0.2);
 }
 
-input.input-invalid {
+input.input-invalid,
+select.input-invalid {
     border-color: #dc2626;
     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+/* Motivo Cards */
+.motivo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.motivo-card {
+    position: relative;
+    cursor: pointer;
+    display: block;
+}
+
+.motivo-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.card-content {
+    padding: 1.25rem;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    background-color: #fff;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    height: 100%;
+}
+
+.motivo-card:hover .card-content {
+    border-color: #cbd5e1;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.motivo-card input[type="radio"]:checked + .card-content {
+    border-color: var(--gold);
+    background-color: rgba(196, 154, 120, 0.05);
+}
+
+.motivo-card input[type="radio"]:checked + .card-content .card-icon {
+    background-color: var(--gold);
+    color: #fff;
+}
+
+.card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: rgba(43, 56, 70, 0.08); /* Light shade of var(--bg-dark) */
+    color: var(--bg-dark);
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.card-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.card-title {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-main);
+}
+
+.card-description {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+/* Responsividade para os cards */
+@media (max-width: 640px) {
+    .motivo-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.motivo-grid.grid-invalid {
+    border: 2px solid #dc2626;
+    border-radius: 12px;
+}
+
+.error-text {
+    color: #dc2626;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-top: 0.5rem;
+}
+
+.error-text.hidden {
+    display: none;
 }
 
 .form-actions {

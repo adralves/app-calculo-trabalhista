@@ -1,3 +1,5 @@
+console.log('script.js carregado em:', new Date().toLocaleTimeString());
+
 function formatWhatsapp(value) {
     const digits = String(value || '').replace(/\D/g, '').slice(0, 11);
 
@@ -30,6 +32,7 @@ window.formatWhatsapp = formatWhatsapp;
 window.formatCurrency = formatCurrency;
 
 function initCalculatorForm() {
+    console.log('Executando initCalculatorForm');
     const form = document.getElementById('calcForm');
     const btnText = document.querySelector('.btn-text');
     const loader = document.querySelector('.loader');
@@ -60,6 +63,34 @@ function initCalculatorForm() {
 
         return isValid;
     }
+
+    function validateMotivo() {
+        const selected = form.querySelector('input[name="motivo"]:checked');
+        const grid = form.querySelector('.motivo-grid');
+        const errorText = document.getElementById('motivo-error');
+        const firstRadio = form.querySelector('input[name="motivo"]');
+
+        if (!selected) {
+            if (grid) grid.classList.add('grid-invalid');
+            if (errorText) errorText.classList.remove('hidden');
+            if (firstRadio) firstRadio.setCustomValidity('Selecione o motivo da rescisão.');
+            return false;
+        } else {
+            if (grid) grid.classList.remove('grid-invalid');
+            if (errorText) errorText.classList.add('hidden');
+            const radios = form.querySelectorAll('input[name="motivo"]');
+            radios.forEach(r => r.setCustomValidity(''));
+            return true;
+        }
+    }
+
+    // Adiciona listener para limpar erro ao selecionar
+    const motivoRadios = form.querySelectorAll('input[name="motivo"]');
+    motivoRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+            validateMotivo();
+        });
+    });
 
     if (whatsappInput && !whatsappInput.dataset.maskReady) {
         whatsappInput.dataset.maskReady = 'true';
@@ -111,10 +142,27 @@ function initCalculatorForm() {
 
     form.dataset.submitReady = 'true';
 
+    const submitBtn = document.getElementById('btnCalcular');
+    if (submitBtn) {
+        submitBtn.addEventListener('click', () => {
+            validateWhatsapp();
+            validateMotivo();
+        });
+    }
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        if (!validateWhatsapp() || !form.checkValidity()) {
+        const vWhatsapp = validateWhatsapp();
+        const vMotivo = validateMotivo();
+        const vCheck = form.checkValidity();
+
+        console.log('Validação WhatsApp:', vWhatsapp);
+        console.log('Validação Motivo:', vMotivo);
+        console.log('CheckValidity do Form:', vCheck);
+
+        if (!vWhatsapp || !vMotivo || !vCheck) {
+            console.warn('Falha na validação do formulário');
             form.reportValidity();
             return;
         }

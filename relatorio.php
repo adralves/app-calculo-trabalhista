@@ -74,6 +74,12 @@ $motivoKey = $inputs['motivo'] ?? '';
 $motivoStr = $motivos[$motivoKey] ?? ($motivoKey !== '' ? $motivoKey : '-');
 $detalhes = is_array($result['detalhes'] ?? null) ? $result['detalhes'] : [];
 $resumo = is_array($result['resumo'] ?? null) ? $result['resumo'] : [];
+
+$mensagemZap = "Olá, me chamo " . $nomeCapturado . ". Gostaria de tirar dúvidas sobre o meu cálculo rescisório.";
+$zapUrl = "https://wa.me/5585991562067?text=" . urlencode($mensagemZap);
+
+// URL para geração de PDF via dompdf
+$pdfUrl = !empty($_GET['id']) ? 'gerar_pdf.php?id=' . urlencode($_GET['id']) : null;
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -221,9 +227,51 @@ $resumo = is_array($result['resumo'] ?? null) ? $result['resumo'] : [];
             color: #999;
         }
 
+        .whatsapp-cta {
+            background-color: #25D366;
+            color: white !important;
+            padding: 1rem;
+            font-size: 1rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: transform 0.2s, background-color 0.2s;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+            margin-top: 15px;
+            margin-bottom: 20px;
+            width: fit-content;
+        }
+        .whatsapp-cta:hover {
+            background-color: #128C7E;
+            transform: translateY(-3px);
+        }
+
         @media print {
             .no-print {
                 display: none;
+            }
+
+            .whatsapp-cta {
+                display: flex !important;
+                justify-content: center;
+                align-items: center;
+                background-color: #25D366 !important;
+                color: white !important;
+                border: none !important;
+                box-shadow: none !important;
+                page-break-inside: avoid;
+                text-decoration: none !important;
+            }
+
+            .whatsapp-cta svg {
+                vertical-align: middle;
+                margin-right: 8px;
+                display: inline-block !important;
+                fill: white !important;
             }
 
             body {
@@ -292,6 +340,14 @@ $resumo = is_array($result['resumo'] ?? null) ? $result['resumo'] : [];
             </tr>
         </table>
 
+        <!-- Botão do WhatsApp Replicado -->
+     <!--    <div style="display: flex; justify-content: center;">
+            <a href="<?= htmlspecialchars($zapUrl) ?>" target="_blank" class="whatsapp-cta">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.414 0 .018 5.394 0 12.03c0 2.12.551 4.189 1.597 6.027L0 24l6.135-1.61a11.811 11.811 0 005.908 1.603h.005c6.637 0 12.033-5.395 12.036-12.033a11.976 11.976 0 00-3.532-8.513z"/></svg>
+                Falar no WhatsApp
+            </a>
+        </div> -->
+
         <div class="section-title">DETALHAMENTO DAS VERBAS RESCISÓRIAS</div>
         <table class="grid">
             <thead>
@@ -339,9 +395,14 @@ $resumo = is_array($result['resumo'] ?? null) ? $result['resumo'] : [];
             <button
                 onclick="if(document.referrer) { window.location.href = document.referrer; } else { window.close(); }"
                 style="padding: 10px 20px; background: #64748b; color: #fff; border: none; cursor: pointer; border-radius: 5px; font-weight: bold;">Voltar</button>
+            <?php if ($pdfUrl): ?>
+            <a href="<?= htmlspecialchars($pdfUrl) ?>"
+                style="padding: 10px 20px; background: #6ED886; color: #fff; border: none; cursor: pointer; border-radius: 5px; font-weight: bold; text-decoration: none; display: inline-block;">
+                &#128462; Salvar PDF</a>
+            <?php else: ?>
             <button onclick="window.print()"
-                style="padding: 10px 20px; background: #6ED886; color: #fff; border: none; cursor: pointer; border-radius: 5px; font-weight: bold;">Imprimir
-                / Salvar PDF</button>
+                style="padding: 10px 20px; background: #6ED886; color: #fff; border: none; cursor: pointer; border-radius: 5px; font-weight: bold;">Imprimir / Salvar PDF</button>
+            <?php endif; ?>
         </div>
 
         <div class="footer">

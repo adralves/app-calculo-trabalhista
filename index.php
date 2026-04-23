@@ -56,15 +56,69 @@
                     </div>
 
                     <div class="form-group full-width">
-                        <label for="motivo">Motivo da Rescisão</label>
-                        <select id="motivo" name="motivo" required>
-                            <option value="">Selecione o motivo...</option>
-                            <option value="dispensa_sem_justa_causa">Dispensa sem Justa Causa</option>
-                            <option value="pedido_demissao">Pedido de Demissao</option>
-                            <option value="dispensa_com_justa_causa">Dispensa com Justa Causa</option>
-                            <option value="termino_contrato">Termino de Contrato</option>
-                            <option value="acordo">Rescisão por Acordo (Reforma Trabalhista)</option>
-                        </select>
+                        <label>Motivo da Rescisão</label>
+                        <div class="motivo-grid">
+                            <label class="motivo-card">
+                                <input type="radio" name="motivo" value="dispensa_sem_justa_causa" required>
+                                <div class="card-content">
+                                    <div class="card-icon">
+                                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M22 10.5h-6m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="card-info">
+                                        <span class="card-title">Sem Justa Causa</span>
+                                        <span class="card-description">Fui demitido(a) sem motivo</span>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <label class="motivo-card">
+                                <input type="radio" name="motivo" value="dispensa_com_justa_causa">
+                                <div class="card-content">
+                                    <div class="card-icon">
+                                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 13h1.5C5.328 13 6 12.328 6 11.5V9C6 8.172 5.328 7.5 4.5 7.5H3m18 5.5h-1.5C18.672 13 18 12.328 18 11.5V9C18 8.172 18.672 7.5 19.5 7.5H21m-9 5.5v7.5M12 9V3m0 0l-3 3m3-3l3 3M7.5 21h9"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="card-info">
+                                        <span class="card-title">Justa Causa</span>
+                                        <span class="card-description">Fui demitido(a) por justa causa</span>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <label class="motivo-card">
+                                <input type="radio" name="motivo" value="pedido_demissao">
+                                <div class="card-content">
+                                    <div class="card-icon">
+                                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="card-info">
+                                        <span class="card-title">Pedido de Demissão</span>
+                                        <span class="card-description">Eu pedi para sair</span>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <label class="motivo-card">
+                                <input type="radio" name="motivo" value="rescisao_indireta">
+                                <div class="card-content">
+                                    <div class="card-icon">
+                                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0012 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 01-2.031.352 5.988 5.988 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 01-2.031.352 5.989 5.989 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="card-info">
+                                        <span class="card-title">Rescisão Indireta</span>
+                                        <span class="card-description">A empresa descumpriu o contrato</span>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        <div id="motivo-error" class="error-text hidden">Por favor, selecione o motivo da rescisão.</div>
                     </div>
 
                     <div class="form-group">
