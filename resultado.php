@@ -15,9 +15,9 @@ function formatMoney($val) {
     return 'R$ ' . number_format($val, 2, ',', '.');
 }
 
-// Mensagem para o WhatsApp conforme pedido pelo usuário
-$mensagemZap = "Olá, me chamo " . $nome . ". Meu número de cálculo é " . $id_calc . ". Gostaria de receber o relatório completo.";
-$zapUrl = "https://wa.me/5585991562067?text=" . urlencode($mensagemZap);
+// Mensagem para o WhatsApp
+//$mensagemZap = "Olá, me chamo " . $nome . ". Meu número de cálculo é " . $id_calc . ". Gostaria de receber o relatório completo.";
+$zapUrl = "https://wa.me/5585991562067?text=#20 - Olá! Gostaria de receber o relatório completo Nº " . $id_calc . "."; //. urlencode($mensagemZap);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">

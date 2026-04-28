@@ -1,9 +1,9 @@
 <?php
 // Configurações do Banco de Dados (Altere conforme sua instalação)
 $host = 'localhost';
-$dbname = 'db_calculo';
-$user = 'root';
-$pass = '';
+$dbname = 'agenci85_calc_trabalhista';
+$user = 'agenci85_calc';
+$pass = '{0^a5xikYRap^~k-';
 
 try {
     // Conexão PDO

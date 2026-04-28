@@ -77,8 +77,9 @@ $detalhes  = is_array($result['detalhes'] ?? null) ? $result['detalhes'] : [];
 $resumo    = is_array($result['resumo'] ?? null) ? $result['resumo'] : [];
 
 // Pré-cálculo de todos os valores para uso no HTML
-$msgZap   = "Ola, me chamo " . $nomeCapturado . ". Gostaria de tirar duvidas sobre o meu calculo rescisoio.";
-$zapUrl   = "https://wa.me/5585991562067?text=" . urlencode($msgZap);
+//$msgZap   = "Ola, me chamo " . $nomeCapturado . ". Gostaria de tirar duvidas sobre o meu calculo rescisoio.";
+
+$zapUrl   = "https://wa.me/5585991562067?text=#20 - Olá, me chamo " . $nomeCapturado . ". Gostaria de mais informações sobre o meu calculo rescisório."; //. urlencode($msgZap);
 
 $logoPath   = __DIR__ . '/assets/img/logo.png';
 $logoBase64 = '';
