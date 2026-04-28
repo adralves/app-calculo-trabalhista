@@ -50,6 +50,17 @@ function formatMoney($val)
     return 'R$ ' . number_format((float) $val, 2, ',', '.');
 }
 
+function formatMoneyComparativo($val)
+{
+    $val = (float) $val;
+
+    if ($val < 0) {
+        return '-R$ ' . number_format(abs($val), 2, ',', '.');
+    }
+
+    return formatMoney($val);
+}
+
 function formatDate($dateStr)
 {
     if (empty($dateStr)) {
@@ -63,11 +74,153 @@ function formatDate($dateStr)
     }
 }
 
+function calcularParcelaSeguroDesemprego($salarioMedio)
+{
+    $salarioMedio = (float) $salarioMedio;
+
+    if ($salarioMedio <= 2222.17) {
+        $parcela = $salarioMedio * 0.8;
+    } elseif ($salarioMedio <= 3703.99) {
+        $parcela = (($salarioMedio - 2222.17) * 0.5) + 1777.74;
+    } else {
+        $parcela = 2518.65;
+    }
+
+    return max(1621.00, min($parcela, 2518.65));
+}
+
+function estimarParcelasSeguroDesemprego($mesesTrabalhados)
+{
+    if ($mesesTrabalhados >= 24) {
+        return 5;
+    }
+
+    if ($mesesTrabalhados >= 12) {
+        return 4;
+    }
+
+    if ($mesesTrabalhados >= 6) {
+        return 3;
+    }
+
+    return 0;
+}
+
+function calcularComparativoRescisao($inputs, $motivoComparado)
+{
+    $dataAdmissao = new DateTime($inputs['data_admissao'] ?? 'now');
+    $dataDemissao = new DateTime($inputs['data_demissao'] ?? 'now');
+    $salario = (float) ($inputs['ultimo_salario'] ?? 0);
+    $tipoAviso = $inputs['aviso_previo'] ?? 'indenizado';
+
+    $diffTotal = $dataAdmissao->diff($dataDemissao);
+    $anosTrabalhados = $diffTotal->y;
+    $mesesTrabalhadosTotal = ($anosTrabalhados * 12) + $diffTotal->m;
+    if ($diffTotal->d >= 15) {
+        $mesesTrabalhadosTotal++;
+    }
+
+    $diasTrabalhadosMesDemissao = (int) $dataDemissao->format('d');
+    $saldoSalario = ($salario / 30) * $diasTrabalhadosMesDemissao;
+
+    $avisoPrevio = 0;
+    if ($motivoComparado === 'rescisao_indireta') {
+        $diasAviso = min(30 + (3 * $anosTrabalhados), 90);
+        $avisoPrevio = ($salario / 30) * $diasAviso;
+    } elseif ($motivoComparado === 'pedido_demissao' && $tipoAviso === 'nao_cumprido') {
+        $avisoPrevio = $salario * -1;
+    }
+
+    $mesesAnoAtual = (int) $dataDemissao->format('n');
+    if ((int) $dataDemissao->format('d') < 15) {
+        $mesesAnoAtual--;
+    }
+    $decimoTerceiro = ($salario / 12) * max(0, $mesesAnoAtual);
+
+    $mesesProp = $diffTotal->m;
+    if ($diffTotal->d >= 15) {
+        $mesesProp++;
+    }
+    $feriasProporcionais = ($salario / 12) * max(0, $mesesProp);
+    $tercoFerias = $feriasProporcionais / 3;
+
+    $fgtsTotal = 0;
+    $multaFgts = 0;
+    $seguroDesemprego = 0;
+    if ($motivoComparado === 'rescisao_indireta') {
+        $fgtsTotal = ($salario * 0.08) * $mesesTrabalhadosTotal;
+        $multaFgts = $fgtsTotal * 0.40;
+        $seguroDesemprego = calcularParcelaSeguroDesemprego($salario) * estimarParcelasSeguroDesemprego($mesesTrabalhadosTotal);
+    }
+
+    $total = $saldoSalario + $avisoPrevio + $decimoTerceiro + $feriasProporcionais + $tercoFerias + $fgtsTotal + $multaFgts + $seguroDesemprego;
+
+    return [
+        'saldo_salario' => $saldoSalario,
+        'aviso_previo' => $avisoPrevio,
+        'decimo_terceiro' => $decimoTerceiro,
+        'ferias_proporcionais' => $feriasProporcionais,
+        'terco_ferias' => $tercoFerias,
+        'fgts_total' => $fgtsTotal,
+        'multa_fgts' => $multaFgts,
+        'seguro_desemprego' => $seguroDesemprego,
+        'total' => $total,
+    ];
+}
+
+function montarTabelaComparativa($inputs)
+{
+    $pedido = calcularComparativoRescisao($inputs, 'pedido_demissao');
+    $indireta = calcularComparativoRescisao($inputs, 'rescisao_indireta');
+    $diferenca = max(0, ($indireta['total'] ?? 0) - ($pedido['total'] ?? 0));
+
+    $linhas = [
+        ['Saldo de Sal&aacute;rio', 'saldo_salario'],
+        ['Aviso Pr&eacute;vio', 'aviso_previo'],
+        ['13&ordm; Proporcional', 'decimo_terceiro'],
+        ['F&eacute;rias Proporcionais', 'ferias_proporcionais'],
+        ['1/3 de F&eacute;rias', 'terco_ferias'],
+        ['FGTS Total (8%)', 'fgts_total'],
+        ['Multa FGTS (40%)', 'multa_fgts'],
+        ['Seguro Desemprego', 'seguro_desemprego'],
+    ];
+
+    $html = '<div class="comparativo-section">';
+    $html .= '<h2>Comparativo: Pedido de Demiss&atilde;o vs Rescis&atilde;o Indireta</h2>';
+    $html .= '<table class="comparativo-table"><thead><tr>';
+    $html .= '<th>Verba Trabalhista</th><th>Pedido de Demiss&atilde;o</th><th>Rescis&atilde;o Indireta</th>';
+    $html .= '</tr></thead><tbody>';
+
+    foreach ($linhas as $linha) {
+        $html .= '<tr>';
+        $html .= '<td>' . $linha[0] . '</td>';
+        $html .= '<td class="text-right">' . formatMoneyComparativo($pedido[$linha[1]] ?? 0) . '</td>';
+        $html .= '<td class="text-right">' . formatMoneyComparativo($indireta[$linha[1]] ?? 0) . '</td>';
+        $html .= '</tr>';
+    }
+
+    $html .= '<tr class="comparativo-total">';
+    $html .= '<td>TOTAL</td>';
+    $html .= '<td class="text-right">' . formatMoneyComparativo($pedido['total'] ?? 0) . '</td>';
+    $html .= '<td class="text-right">' . formatMoneyComparativo($indireta['total'] ?? 0) . '</td>';
+    $html .= '</tr>';
+    $html .= '</tbody></table>';
+    $html .= '<div class="comparativo-alert">';
+    $html .= '<strong>Voc&ecirc; pode estar perdendo ' . formatMoneyComparativo($diferenca) . '</strong>';
+    $html .= '<span>A rescis&atilde;o indireta &eacute; poss&iacute;vel quando a empresa descumpre o contrato de trabalho.</span>';
+    $html .= '</div>';
+    $html .= '<p class="comparativo-note">Seguro-desemprego estimado com base na tabela vigente desde 11/01/2026, usando o &uacute;ltimo sal&aacute;rio informado como sal&aacute;rio m&eacute;dio.</p>';
+    $html .= '</div>';
+
+    return $html;
+}
+
 $motivos = [
     'dispensa_sem_justa_causa' => 'Dispensa sem Justa Causa',
     'pedido_demissao'          => 'Pedido de Demissao',
     'dispensa_com_justa_causa' => 'Dispensa com Justa Causa',
     'termino_contrato'         => 'Termino de Contrato',
+    'rescisao_indireta'         => 'Rescisao Indireta',
     'acordo'                   => 'Rescisao por Acordo (Reforma Trabalhista)',
 ];
 
@@ -136,6 +289,18 @@ table.grid th { background-color:#f9f9f9; color:#555; }
 .summary-proventos { background-color:#F0FDF4; color:#166534; }
 .summary-descontos { background-color:#FEF2F2; color:#B91C1C; }
 .summary-liquido { background-color:#EFF6FF; color:#1E40AF; font-size:16px; font-weight:bold; }
+.comparativo-section { margin-top:22px; page-break-inside:avoid; }
+.comparativo-section h2 { color:#2B3846; font-size:20px; margin:0 0 12px; }
+.comparativo-alert { background-color:#F0FDF4; border:1px solid #166534; border-radius:8px; color:#166534; margin:15px 0 0; padding:14px 18px; text-align:center; }
+.comparativo-alert strong { display:block; font-size:19px; margin-bottom:8px; }
+.comparativo-alert span { display:block; color:#3f6849; font-size:13px; }
+.comparativo-table { width:100%; border-collapse:collapse; font-size:14px; }
+.comparativo-table th { background-color:#2B3846; color:#fff; padding:10px 12px; text-align:left; font-weight:bold; }
+.comparativo-table td { padding:9px 12px; color:#555; }
+.comparativo-table tbody tr:nth-child(odd) td { background-color:#f9f9f9; }
+.comparativo-table tbody tr:nth-child(even) td { background-color:#fff; }
+.comparativo-total td { background-color:#2B3846 !important; color:#fff !important; font-size:16px; font-weight:bold; }
+.comparativo-note { color:#777; font-size:11px; margin:8px 0 0; }
 .footer { margin-top:15px; text-align:center; font-size:11px; color:#999; border-top:1px solid #eee; padding-top:10px; }
 ';
 $html .= '</style></head><body>';
@@ -184,6 +349,10 @@ $html .= '<tr class="summary-proventos"><th>Total de Proventos</th><td class="te
 $html .= '<tr class="summary-descontos"><th>Total de Descontos</th><td class="text-right">' . $totalDescontos . '</td></tr>';
 $html .= '<tr class="summary-liquido"><th>Valor Liquido</th><td class="text-right">' . $liquido . '</td></tr>';
 $html .= '</table></div>';
+
+if ($motivoKey === 'pedido_demissao') {
+    $html .= montarTabelaComparativa($inputs);
+}
 
 // Rodapé
 $html .= '<div class="footer"><p>Este e um demonstrativo de calculo simplificado e nao substitui os documentos oficiais ou calculos contabeis complexos.</p></div>';
